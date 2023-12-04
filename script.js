@@ -7,17 +7,18 @@ let windowsData = {
         screenY: window.screenY,
         innerWidth: window.innerWidth,
         innerHeight: window.innerHeight,
-        windowId: windowId
+        windowId: windowId,
     }
 };
-
-function broadcastLoc() {
+console.log(windowsData)
+function updateWindowLocation() {
     windowsData[windowId] = {
         screenX: window.screenX,
         screenY: window.screenY,
         innerWidth: window.innerWidth,
         innerHeight: window.innerHeight,
-        windowId: windowId
+        windowId: windowId,
+       
     };
     channel.postMessage(windowsData[windowId]);
 }
@@ -28,12 +29,12 @@ channel.onmessage = (event) => {
     drawLines(windowsData, windowId);
 };
 
-setInterval(broadcastLoc, 10);
+setInterval(updateWindowLocation, 10);
 
 
 
 function drawLines(windowsData, currentWindowId) {
-    const lineEndPoints = calculateLinePositions(currentWindowId, windowsData);
+    const lineEndPoints = calculateLines(currentWindowId, windowsData);
     const canvas = document.getElementById('lineCanvas');
     if (!canvas) {
         return;
@@ -44,8 +45,10 @@ function drawLines(windowsData, currentWindowId) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
-
+    
     lineEndPoints.forEach(point => {
+        ctx.font = "30px Arial"
+        ctx.fillText(`${Math.round(point.x)}, ${Math.round(point.y)}`, (window.innerWidth / 2), (window.innerHeight / 2))
         ctx.beginPath();
         ctx.moveTo(window.innerWidth / 2, window.innerHeight / 2);
         ctx.lineTo(point.x, point.y);
@@ -53,7 +56,7 @@ function drawLines(windowsData, currentWindowId) {
     });
 }
 
-function calculateLinePositions(currentWindowId, windowsData) {
+function calculateLines(currentWindowId, windowsData) {
     const currentWindowData = windowsData[currentWindowId];
     if (!currentWindowData) {
         return [];
